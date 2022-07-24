@@ -1,0 +1,53 @@
+package com.example.davaleba_12
+
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavDirections
+import androidx.navigation.Navigation
+import androidx.recyclerview.widget.RecyclerView
+
+
+class ListFragment : Fragment() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: SportsAdapter
+
+    private val viewModel: ListViewModel by lazy{
+        ViewModelProvider(this).get(ListViewModel::class.java)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        val view: View = inflater.inflate(R.layout.fragment_list, container, false)
+
+        recyclerView = view.findViewById(R.id.recycler_view)
+
+        viewModel.sports.observe(viewLifecycleOwner, Observer { sportsList ->
+            adapter = SportsAdapter(sportsList, sportsItemListener)
+            recyclerView.adapter = adapter
+        })
+
+        RecyclerViewItemDecoration.setItemSpacing(
+            resources,
+            recyclerView
+        )
+
+        return view
+    }
+
+    private val sportsItemListener = SportsAdapter.OnClickListener { sports ->
+        val direction: NavDirections =
+            ListFragmentDirections.actionListFragmentToDetailFragment(sports)
+           Navigation.findNavController(requireView()).navigate(direction)
+    }
+
+}
+
